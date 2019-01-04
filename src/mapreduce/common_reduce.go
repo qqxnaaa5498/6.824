@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"fmt"
 	"os"
+	"strings"
+	"sort"
 	"encoding/json"
 )
 
@@ -50,16 +52,24 @@ func doReduce(
 	// file.Close()
 	//
 	// Your code here (Part I).
-	// 
+	//
 
-	//extract key/values from json
-	content, err := ioutil.ReadFile(outFile)
+	f, err := os.Create(outFile)
 	if err != nil {
-		fmt.printf(err)
+		fmt.Println(err)
 		return
 	}
-	dec := json.NewDecoder(strings.NewReader((string)content))
+	enc := json.NewEncoder(f)
+	//extract key/values from json
+	for i:= 0; i < nMap; i++ {
+	content, err := ioutil.ReadFile(reduceName(jobName, i,reduceTask))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	dec := json.NewDecoder(strings.NewReader(string(content)))
 	var kvs = []KeyValue{}
+	var kv KeyValue
 	for {
 		err := dec.Decode(&kv)
 		kvs = append(kvs, kv)
@@ -77,30 +87,28 @@ func doReduce(
 	var reducedKVs = []KeyValue{}
 	if (len(kvs) > 0) {
 		var currKey = kvs[0].Key
-		var currVals = []KeyValue{kvs[0].Value}
+		var currVals = []string{kvs[0].Value}
 		for i:= 1; i < len(kvs); i++ {
 			if kvs[i].Key == currKey {
 				currVals = append(currVals, kvs[i].Value)
+				continue
 			}
-			else {
-				reducedKVs = append(reducedKVs, KeyValue{currKey, reduceF(currKey, currVals)})
-				currKey = kvs[i].Key
-				currVals = []KeyValue{kvs[0].Value}
-			}
+			reducedKV := KeyValue{currKey, reduceF(currKey, currVals)}
+			reducedKVs = append(reducedKVs, reducedKV)
+			currKey = kvs[i].Key
+			currVals = []string{kvs[0].Value}
 		}
-		reducedKVs = append(reducedKVs, KeyValue{currKey, reducedF(currKey, currVals)})
+		reducedKVs = append(reducedKVs, KeyValue{currKey, reduceF(currKey, currVals)})
 	}
 
 	// write to json
-	enc := json.NewEncoder(outFile)
 	for _, kv := range reducedKVs {
 		err := enc.Encode(&kv)
 		if err != nil {
-			fmt.printf(err)
+			fmt.Println(err)
 			return
 		}
 	}
-	
-	outFile.Close()
-
+}
+f.Close()
 }

@@ -59,16 +59,18 @@ func doMap(
 	//
 	content, err := ioutil.ReadFile(inFile)
 	if err != nil {
-		fmt.printf(err)
+		fmt.Println(err)
 		return
 	}
-	var kvs = mapF(inFile, (string)content)
+	var kvs = mapF(inFile, string(content))
 	imms := make([]*os.File, nReduce)
 	encs := make([]*json.Encoder, nReduce)
 	for i:= 0; i < nReduce; i++ {
-		f, err = os.Create(reduceName(jobName, mapTask, i))
+		fmt.Printf("imtermediate file: %s\n", reduceName(jobName, mapTask, i))
+		f, err := os.Create(reduceName(jobName, mapTask, i))
 		if err != nil {
-			fmt.printf(err)
+			fmt.Printf("error creating: %s\n", reduceName(jobName, mapTask, i))
+			fmt.Println(err)
 			return
 		}
 		imms[i] = f
@@ -78,13 +80,13 @@ func doMap(
 		idx := ihash(kv.Key) % nReduce
 		err := encs[idx].Encode(&kv)
 		if err != nil {
-			fmt.printf(err)
+			fmt.Println(err)
 			return
 		}
 	}
 
 	for i:= 0; i < nReduce; i++ {
-		imms[i].close()
+		imms[i].Close()
 	}
 }
 
