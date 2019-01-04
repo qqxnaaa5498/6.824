@@ -52,6 +52,7 @@ func check(t *testing.T, files []string) {
 
 	var lines []string
 	for _, f := range files {
+		fmt.Printf("fileName: %s\n", f)
 		input, err := os.Open(f)
 		if err != nil {
 			log.Fatal("check: ", err)
