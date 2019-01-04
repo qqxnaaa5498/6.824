@@ -1,5 +1,12 @@
 package mapreduce
 
+import (
+	"io/ioutil"
+	"fmt"
+	"os"
+	"encoding/json"
+)
+
 func doReduce(
 	jobName string, // the name of the whole MapReduce job
 	reduceTask int, // which reduce task this is
@@ -43,5 +50,57 @@ func doReduce(
 	// file.Close()
 	//
 	// Your code here (Part I).
-	//
+	// 
+
+	//extract key/values from json
+	content, err := ioutil.ReadFile(outFile)
+	if err != nil {
+		fmt.printf(err)
+		return
+	}
+	dec := json.NewDecoder(strings.NewReader((string)content))
+	var kvs = []KeyValue{}
+	for {
+		err := dec.Decode(&kv)
+		kvs = append(kvs, kv)
+		if (err != nil) {
+			break;
+		}
+	}
+
+	// sort the intermediate key/value pairs by key
+	sort.Slice(kvs, func(i, j int) bool {
+		return kvs[i].Key < kvs[j].Key
+	})
+
+	// reduce operations
+	var reducedKVs = []KeyValue{}
+	if (len(kvs) > 0) {
+		var currKey = kvs[0].Key
+		var currVals = []KeyValue{kvs[0].Value}
+		for i:= 1; i < len(kvs); i++ {
+			if kvs[i].Key == currKey {
+				currVals = append(currVals, kvs[i].Value)
+			}
+			else {
+				reducedKVs = append(reducedKVs, KeyValue{currKey, reduceF(currKey, currVals)})
+				currKey = kvs[i].Key
+				currVals = []KeyValue{kvs[0].Value}
+			}
+		}
+		reducedKVs = append(reducedKVs, KeyValue{currKey, reducedF(currKey, currVals)})
+	}
+
+	// write to json
+	enc := json.NewEncoder(outFile)
+	for _, kv := range reducedKVs {
+		err := enc.Encode(&kv)
+		if err != nil {
+			fmt.printf(err)
+			return
+		}
+	}
+	
+	outFile.Close()
+
 }

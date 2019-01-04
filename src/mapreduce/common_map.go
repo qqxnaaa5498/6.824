@@ -2,9 +2,8 @@ package mapreduce
 
 import (
 	"hash/fnv"
-	"fmt"
 	"io/ioutil"
-	"log"
+	"fmt"
 	"os"
 	"encoding/json"
 )
@@ -60,7 +59,7 @@ func doMap(
 	//
 	content, err := ioutil.ReadFile(inFile)
 	if err != nil {
-		log.Fatal(err)
+		fmt.printf(err)
 		return
 	}
 	var kvs = mapF(inFile, (string)content)
@@ -69,7 +68,7 @@ func doMap(
 	for i:= 0; i < nReduce; i++ {
 		f, err = os.Create(reduceName(jobName, mapTask, i))
 		if err != nil {
-			log.Fatal(err)
+			fmt.printf(err)
 			return
 		}
 		imms[i] = f
@@ -79,7 +78,7 @@ func doMap(
 		idx := ihash(kv.Key) % nReduce
 		err := encs[idx].Encode(&kv)
 		if err != nil {
-			log.Fatal(err)
+			fmt.printf(err)
 			return
 		}
 	}
