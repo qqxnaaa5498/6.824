@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"mapreduce"
 	"os"
+	"strings"
+	"strconv"
 )
 
 //
@@ -15,6 +18,15 @@ import (
 //
 func mapF(filename string, contents string) []mapreduce.KeyValue {
 	// Your code here (Part II).
+	f := func(c rune) bool {
+		return !unicode.IsNumber(c)
+	}
+	keys := strings.FieldsFunc(contents, f)
+	var kvs []mapreduce.KeyValue{};
+	for _, key := range keys {
+		kvs = append(kvs, mapreduce.KeyValue{key, strconv.Itoa(1)})
+	}
+	return kvs
 }
 
 //
@@ -24,6 +36,11 @@ func mapF(filename string, contents string) []mapreduce.KeyValue {
 //
 func reduceF(key string, values []string) string {
 	// Your code here (Part II).
+	var sum int;
+	for val := range values {
+		sum += strconv.Atoi(val)
+	}
+	return strconv.Itoa(sum)
 }
 
 // Can be run in 3 ways:
