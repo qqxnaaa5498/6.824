@@ -43,14 +43,11 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 	}
 
 	go func() {
-		fmt.Printf("this thread is running\n")
 		waitGroup.Wait()
-		fmt.Printf("ready to clse tasks")
 		close(tasks)
 	}()
 
 	for i := range tasks {
-		fmt.Printf("i = %d\n", i)
 		go func(i int) {
 			worker := <- registerChan
 			var file string
@@ -60,8 +57,8 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 			var taskArgs = DoTaskArgs{jobName, file, phase, i, n_other}
 			taskArgs.TaskNumber = i
 			if call(worker, "Worker.DoTask", &taskArgs, nil) {
-				registerChan <- worker
 				waitGroup.Done()
+				registerChan <- worker
 			} else {
 				tasks <- i
 			}

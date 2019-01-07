@@ -60,21 +60,22 @@ func doReduce(
 		return
 	}
 	enc := json.NewEncoder(f)
+	var kvs = []KeyValue{}
 	//extract key/values from json
 	for i:= 0; i < nMap; i++ {
-	content, err := ioutil.ReadFile(reduceName(jobName, i,reduceTask))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	dec := json.NewDecoder(strings.NewReader(string(content)))
-	var kvs = []KeyValue{}
-	var kv KeyValue
-	for {
-		err := dec.Decode(&kv)
-		kvs = append(kvs, kv)
-		if (err != nil) {
-			break;
+		content, err := ioutil.ReadFile(reduceName(jobName, i,reduceTask))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		dec := json.NewDecoder(strings.NewReader(string(content)))
+		var kv KeyValue
+		for {
+			err := dec.Decode(&kv)
+			kvs = append(kvs, kv)
+			if (err != nil) {
+				break;
+			}
 		}
 	}
 
@@ -96,7 +97,7 @@ func doReduce(
 			reducedKV := KeyValue{currKey, reduceF(currKey, currVals)}
 			reducedKVs = append(reducedKVs, reducedKV)
 			currKey = kvs[i].Key
-			currVals = []string{kvs[0].Value}
+			currVals = []string{kvs[i].Value}
 		}
 		reducedKVs = append(reducedKVs, KeyValue{currKey, reduceF(currKey, currVals)})
 	}
@@ -109,6 +110,6 @@ func doReduce(
 			return
 		}
 	}
-}
+
 f.Close()
 }
