@@ -66,10 +66,8 @@ func doMap(
 	imms := make([]*os.File, nReduce)
 	encs := make([]*json.Encoder, nReduce)
 	for i:= 0; i < nReduce; i++ {
-		fmt.Printf("imtermediate file: %s\n", reduceName(jobName, mapTask, i))
 		f, err := os.Create(reduceName(jobName, mapTask, i))
 		if err != nil {
-			fmt.Printf("error creating: %s\n", reduceName(jobName, mapTask, i))
 			fmt.Println(err)
 			return
 		}
