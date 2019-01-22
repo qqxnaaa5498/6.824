@@ -55,6 +55,7 @@ type Raft struct {
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
 <<<<<<< HEAD
+<<<<<<< HEAD
 	currentTerm int
 	votedFor 	int
 	isLeader  bool
@@ -66,6 +67,8 @@ type Raft struct {
 	RequestVoteReplys 	[]RequestVoteReply
 
 }
+=======
+>>>>>>> parent of 4894dbf... change
 =======
 >>>>>>> parent of 4894dbf... change
 
@@ -236,46 +239,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.me = me
 
 	// Your initialization code here (2A, 2B, 2C).
-<<<<<<< HEAD
-	rf.logs = []Log{}
-	go func(rf *Raft) {
-			for {
-				if rf.isLeader {
-					timer1 := time.NewTimer(time.Millisecond * 100)
-					<-timer1.C
-					rf.mu.Lock()
-					if ^rf.isLeader {
-						rf.mu.Unlock()
-						continue
-					}
-					for peer := 0; peer < len(rf.peers); peer++ {
-						// TODO: This is only a temporary solution. The leader 
-						//provides hearbeat without getting any response
-						go func(peer int) {
-							rf.sendAppendEntries(peer, &AppendEntriesArgs{rf.term, rf.me, 0, 0, rf.logs, 0}, nil)
-							}(peer)
-					}
-					rf.mu.Unlock()
-				}
-				else {
-					randTime:= rand.Intn(200) + 500
-					timer2 := time.NewTimer(time.Millisecond * randTime)
-					<- timer2.C
-					rf.mu.Lock()
-					if ^rf.pinned {
-						for peer := 0; peer < len(rf.peers); peer++ {
-							ṝf.sendRequestVote(peer, )
-						}
-					}
-					else {
-						rf.pinned = false
-					}
-					rf.mu.Unlock()
-				}
-			}
-		}(rf)
-=======
->>>>>>> parent of 4894dbf... change
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
