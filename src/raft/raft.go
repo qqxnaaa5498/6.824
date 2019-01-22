@@ -19,8 +19,6 @@ package raft
 
 import "sync"
 import "labrpc"
-import "time"
-import "math/rand"
 
 // import "bytes"
 // import "labgob"
@@ -52,9 +50,11 @@ type Raft struct {
 	peers     []*labrpc.ClientEnd // RPC end points of all peers
 	persister *Persister          // Object to hold this peer's persisted state
 	me        int                 // this peer's index into peers[]
+
 	// Your data here (2A, 2B, 2C).
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
+<<<<<<< HEAD
 	currentTerm int
 	votedFor 	int
 	isLeader  bool
@@ -66,10 +66,9 @@ type Raft struct {
 	RequestVoteReplys 	[]RequestVoteReply
 
 }
+=======
+>>>>>>> parent of 4894dbf... change
 
-type Log struct {
-	command 	string
-	term 			int
 }
 
 // return currentTerm and whether this server
@@ -131,10 +130,6 @@ func (rf *Raft) readPersist(data []byte) {
 //
 type RequestVoteArgs struct {
 	// Your data here (2A, 2B).
-	candidateId int
-	term 				int
-	lastLogIndex int
-	lastLogTerm  int
 }
 
 //
@@ -143,8 +138,6 @@ type RequestVoteArgs struct {
 //
 type RequestVoteReply struct {
 	// Your data here (2A).
-	term 		int
-	voteGranted bool
 }
 
 //
@@ -153,25 +146,6 @@ type RequestVoteReply struct {
 func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here (2A, 2B).
 }
-
-type AppendEntriesArgs struct {
-	term int
-	leaderId int
-	prevLogIndex int
-	prevLogTerm int
-	entries []Log 
-	leaderCommit int
-}
-
-type AppendEntriesReply struct {
-	term int
-	success bool
-}
-
-func(rd *Raft) AppendEntries(arg *AppendEntriesArgs, reply *AppendEntriesReply) {
-	//TODO
-}
-
 
 //
 // example code to send a RequestVote RPC to a server.
@@ -204,11 +178,6 @@ func(rd *Raft) AppendEntries(arg *AppendEntriesArgs, reply *AppendEntriesReply) 
 //
 func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *RequestVoteReply) bool {
 	ok := rf.peers[server].Call("Raft.RequestVote", args, reply)
-	return ok
-}
-
-func(rd *Raft) sendAppendEntries(server int, arg *AppendEntriesArgs, reply *AppendEntriesReply) bool {
-	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	return ok
 }
 
@@ -267,6 +236,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.me = me
 
 	// Your initialization code here (2A, 2B, 2C).
+<<<<<<< HEAD
 	rf.logs = []Log{}
 	go func(rf *Raft) {
 			for {
@@ -304,6 +274,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 				}
 			}
 		}(rf)
+=======
+>>>>>>> parent of 4894dbf... change
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
