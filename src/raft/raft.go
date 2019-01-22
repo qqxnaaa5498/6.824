@@ -62,6 +62,9 @@ type Raft struct {
 	votesReceived  int 
 	isAlive 	bool
 	pinned  	bool  //whether the follower server was pinned by a leader in a certain amount of time
+	appendEntriesReplys []AppendEntriesReply
+	RequestVoteReplys 	[]RequestVoteReply
+
 }
 
 type Log struct {
@@ -264,6 +267,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.me = me
 
 	// Your initialization code here (2A, 2B, 2C).
+	rf.logs = []Log{}
 	go func(rf *Raft) {
 			for {
 				if rf.isLeader {
@@ -277,7 +281,9 @@ func Make(peers []*labrpc.ClientEnd, me int,
 					for peer := 0; peer < len(rf.peers); peer++ {
 						// TODO: This is only a temporary solution. The leader 
 						//provides hearbeat without getting any response
-						rf.sendAppendEntries(peer, arg *AppendEntriesArgs, nil)
+						go func(peer int) {
+							rf.sendAppendEntries(peer, &AppendEntriesArgs{rf.term, rf.me, 0, 0, rf.logs, 0}, nil)
+							}(peer)
 					}
 					rf.mu.Unlock()
 				}
@@ -288,7 +294,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 					rf.mu.Lock()
 					if ^rf.pinned {
 						for peer := 0; peer < len(rf.peers); peer++ {
-							ṝf.sendRequestVote()
+							ṝf.sendRequestVote(peer, )
 						}
 					}
 					else {
